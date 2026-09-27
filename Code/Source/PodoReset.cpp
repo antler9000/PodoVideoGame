@@ -692,7 +692,13 @@ void Podo::ResetRTV()
 	CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandleRTV = m_descriptorHeapRTVStartHandleCPU;
 	for (UINT i = 0; i < m_screenBackBufferCount; i++)
 	{
-		m_device->CreateRenderTargetView(m_screenBackBuffers[i].Get(), nullptr, cpuHandleRTV.Offset(i, m_descriptorHeapRTVIncrementSize));
+		D3D12_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = {};
+		renderTargetViewDesc.Format					= m_optionHDR.IsActive() ? m_screenRTVFormatHDR : m_screenRTVFormatSDR;
+		renderTargetViewDesc.ViewDimension			= D3D12_RTV_DIMENSION_TEXTURE2D;
+		renderTargetViewDesc.Texture2D.MipSlice		= 0;
+		renderTargetViewDesc.Texture2D.PlaneSlice	= 0;
+
+		m_device->CreateRenderTargetView(m_screenBackBuffers[i].Get(), &renderTargetViewDesc, cpuHandleRTV.Offset(i, m_descriptorHeapRTVIncrementSize));
 	}
 }
 
@@ -707,25 +713,51 @@ void Podo::ResetAssets()
 
 	std::vector<Vertex> boxVertices =
 	{
-		{DirectX::XMFLOAT3{-0.5f, -0.5f, -0.5f}},
-		{DirectX::XMFLOAT3{-0.5f, +0.5f, -0.5f}},
-		{DirectX::XMFLOAT3{+0.5f, +0.5f, -0.5f}},
-		{DirectX::XMFLOAT3{+0.5f, -0.5f, -0.5f}},
+		// -Z(Red)
+		{{-0.5f, -0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, {0.5f, 0.0f, 0.0f}},
+		{{-0.5f, +0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, {0.5f, 0.0f, 0.0f}},
+		{{+0.5f, +0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, {0.5f, 0.0f, 0.0f}},
+		{{+0.5f, -0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, {0.5f, 0.0f, 0.0f}},
 
-		{DirectX::XMFLOAT3{-0.5f, -0.5f, +0.5f}},
-		{DirectX::XMFLOAT3{-0.5f, +0.5f, +0.5f}},
-		{DirectX::XMFLOAT3{+0.5f, +0.5f, +0.5f}},
-		{DirectX::XMFLOAT3{+0.5f, -0.5f, +0.5f}}
+		// +Z(Red)
+		{{-0.5f, -0.5f, +0.5f}, { 0.0f,  0.0f, +1.0f}, {0.5f, 0.0f, 0.0f}},
+		{{-0.5f, +0.5f, +0.5f}, { 0.0f,  0.0f, +1.0f}, {0.5f, 0.0f, 0.0f}},
+		{{+0.5f, +0.5f, +0.5f}, { 0.0f,  0.0f, +1.0f}, {0.5f, 0.0f, 0.0f}},
+		{{+0.5f, -0.5f, +0.5f}, { 0.0f,  0.0f, +1.0f}, {0.5f, 0.0f, 0.0f}},
+
+		// -X(Green)
+		{{-0.5f, -0.5f, +0.5f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 0.5f, 0.0f}},
+		{{-0.5f, +0.5f, +0.5f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 0.5f, 0.0f}},
+		{{-0.5f, +0.5f, -0.5f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 0.5f, 0.0f}},
+		{{-0.5f, -0.5f, -0.5f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 0.5f, 0.0f}},
+
+		// +X(Green)
+		{{+0.5f, -0.5f, -0.5f}, {+1.0f,  0.0f,  0.0f}, {0.0f, 0.5f, 0.0f}},
+		{{+0.5f, +0.5f, -0.5f}, {+1.0f,  0.0f,  0.0f}, {0.0f, 0.5f, 0.0f}},
+		{{+0.5f, +0.5f, +0.5f}, {+1.0f,  0.0f,  0.0f}, {0.0f, 0.5f, 0.0f}},
+		{{+0.5f, -0.5f, +0.5f}, {+1.0f,  0.0f,  0.0f}, {0.0f, 0.5f, 0.0f}},
+
+		// +Y(Blue)
+		{{-0.5f, +0.5f, -0.5f}, { 0.0f, +1.0f,  0.0f}, {0.0f, 0.0f, 0.5f}},
+		{{-0.5f, +0.5f, +0.5f}, { 0.0f, +1.0f,  0.0f}, {0.0f, 0.0f, 0.5f}},
+		{{+0.5f, +0.5f, +0.5f}, { 0.0f, +1.0f,  0.0f}, {0.0f, 0.0f, 0.5f}},
+		{{+0.5f, +0.5f, -0.5f}, { 0.0f, +1.0f,  0.0f}, {0.0f, 0.0f, 0.5f}},
+
+		// -Y(Blue)
+		{{-0.5f, -0.5f, +0.5f}, { 0.0f, -1.0f,  0.0f}, {0.0f, 0.0f, 0.5f}},
+		{{-0.5f, -0.5f, -0.5f}, { 0.0f, -1.0f,  0.0f}, {0.0f, 0.0f, 0.5f}},
+		{{+0.5f, -0.5f, -0.5f}, { 0.0f, -1.0f,  0.0f}, {0.0f, 0.0f, 0.5f}},
+		{{+0.5f, -0.5f, +0.5f}, { 0.0f, -1.0f,  0.0f}, {0.0f, 0.0f, 0.5f}}
 	};
 
 	std::vector<uint32_t> boxIndices =
 	{
-		0, 1, 2,  0, 2, 3,
-		4, 6, 5,  4, 7, 6,
-		4, 5, 1,  4, 1, 0,
-		3, 2, 6,  3, 6, 7,
-		1, 5, 6,  1, 6, 2,
-		4, 0, 3,  4, 3, 7
+		0,	1,	2,		0,	2,	3,	// -Z
+		4,	6,	5,		4,	7,  6,	// +Z
+		8,	9,	10,		8,	10,	11,	// -X
+		12,	13,	14,		12,	14,	15,	// +X
+		16,	17,	18,		16,	18,	19,	// +Y
+		20,	21,	22,		20,	22,	23	// -Y
 	};
 
 	DirectX::ResourceUploadBatch resourceUpload(m_device.Get());
@@ -759,7 +791,7 @@ void Podo::ResetObjects()
 		boxObject.SetScale(scale);
 		boxObject.SetRotation(lookDirection, upDirection);
 		boxObject.SetPosition(position);
-		boxObject.UpdateWorldMatrix();
+		boxObject.UpdateObjectConstantBuffer();
 
 		m_workloadObjects["HorizontalBoxObject"] = std::move(boxObject);
 	}
@@ -775,7 +807,7 @@ void Podo::ResetObjects()
 		boxObject.SetScale(scale);
 		boxObject.SetRotation(lookDirection, upDirection);
 		boxObject.SetPosition(position);
-		boxObject.UpdateWorldMatrix();
+		boxObject.UpdateObjectConstantBuffer();
 
 		m_workloadObjects["VerticalBoxObject"] = std::move(boxObject);
 	}
@@ -794,12 +826,12 @@ void Podo::ResetCBVSRVUAV()
 	for (auto& [name, object] : m_workloadObjects)
 	{
 		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-		cbvDesc.BufferLocation	= object.GetWorldMatrixConstantBufferGPUAddress();
-		cbvDesc.SizeInBytes		= object.GetWorldMatrixConstantBufferWidth();
+		cbvDesc.BufferLocation	= object.GetObjectConstantBufferGPUAddress();
+		cbvDesc.SizeInBytes		= object.GetObjectConstantBufferWidth();
 
 		m_device->CreateConstantBufferView(&cbvDesc, cpuHandle);
 
-		object.SetWorldMatrixConstantBufferViewGPUHandle(gpuHandle);
+		object.SetObjectConstantBufferViewGPUHandle(gpuHandle);
 
 		cpuHandle.Offset(1, m_descriptorHeapCBVSRVUAVIncrementSize);
 		gpuHandle.Offset(1, m_descriptorHeapCBVSRVUAVIncrementSize);
@@ -861,7 +893,10 @@ void Podo::ResetPipelineStateObject()
 {
 	D3D12_INPUT_ELEMENT_DESC inputElementDesc[] =
 	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+		{"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+		
 	};
 
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = { inputElementDesc, _countof(inputElementDesc) };
@@ -882,7 +917,7 @@ void Podo::ResetPipelineStateObject()
 	pipelineStateObjectDesc.SampleMask							= UINT_MAX;
 	pipelineStateObjectDesc.PrimitiveTopologyType				= D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	pipelineStateObjectDesc.NumRenderTargets					= 1;
-	pipelineStateObjectDesc.RTVFormats[0]						= m_optionHDR.IsActive() ? m_screenBackBufferFormatHDR : m_screenBackBufferFormatSDR;
+	pipelineStateObjectDesc.RTVFormats[0]						= m_optionHDR.IsActive() ? m_screenRTVFormatHDR : m_screenRTVFormatSDR;
 	pipelineStateObjectDesc.SampleDesc.Count					= 1;
 	pipelineStateObjectDesc.SampleDesc.Quality					= 0;
 	pipelineStateObjectDesc.DSVFormat							= m_screenDepthStencilBufferFormat;
@@ -900,8 +935,7 @@ void Podo::ResetImGui()
 	initInfo.Device				= m_device.Get();
 	initInfo.CommandQueue		= m_commandQueue.Get();
 	initInfo.NumFramesInFlight	= 1;
-	initInfo.RTVFormat			= m_optionHDR.IsActive() ? m_screenBackBufferFormatHDR : m_screenBackBufferFormatSDR;
-
+	initInfo.RTVFormat			= m_optionHDR.IsActive() ? m_screenRTVFormatHDR : m_screenRTVFormatSDR;
 	initInfo.SrvDescriptorHeap = m_descriptorHeapCBVSRVUAV.Get();
 	initInfo.SrvDescriptorAllocFn = [](ImGui_ImplDX12_InitInfo*, D3D12_CPU_DESCRIPTOR_HANDLE* pOutCpuHandle, D3D12_GPU_DESCRIPTOR_HANDLE* outGpuHandle)
 		{
@@ -925,25 +959,25 @@ void Podo::ResetImGui()
 	style.FontScaleDpi = imGuiScale;
 
 	ImVec4* colors = style.Colors;
-	colors[ImGuiCol_Text]				= ImVec4(0.78f, 0.74f, 0.63f, 1.0f);
-	colors[ImGuiCol_TextDisabled]		= ImVec4(0.38f, 0.38f, 0.34f, 1.0f);
-	colors[ImGuiCol_FrameBg]			= ImVec4(0.105f, 0.110f, 0.100f, 1.0f);
-	colors[ImGuiCol_FrameBgHovered]		= ImVec4(0.185f, 0.175f, 0.130f, 1.0f);
-	colors[ImGuiCol_FrameBgActive]		= ImVec4(0.260f, 0.230f, 0.140f, 1.0f);
-	colors[ImGuiCol_CheckMark]			= ImVec4(0.82f, 0.68f, 0.32f, 1.0f);
-	colors[ImGuiCol_SliderGrab]			= ImVec4(0.58f, 0.50f, 0.30f, 1.0f);
-	colors[ImGuiCol_SliderGrabActive]	= ImVec4(0.82f, 0.66f, 0.28f, 1.0f);
-	colors[ImGuiCol_WindowBg]			= ImVec4(0.075f, 0.078f, 0.075f, 1.0f);
-	colors[ImGuiCol_TitleBg]			= ImVec4(0.115f, 0.115f, 0.105f, 1.0f);
-	colors[ImGuiCol_TitleBgActive]		= ImVec4(0.180f, 0.170f, 0.145f, 1.0f);
-	colors[ImGuiCol_TitleBgCollapsed]	= ImVec4(0.060f, 0.062f, 0.060f, 1.0f);
-	colors[ImGuiCol_Button]				= ImVec4(0.210f, 0.215f, 0.200f, 1.0f);
-	colors[ImGuiCol_ButtonHovered]		= ImVec4(0.340f, 0.320f, 0.250f, 1.0f);
-	colors[ImGuiCol_ButtonActive]		= ImVec4(0.470f, 0.380f, 0.180f, 1.0f);
-	colors[ImGuiCol_Border]				= ImVec4(0.30f, 0.28f, 0.23f, 0.55f);
-	colors[ImGuiCol_Separator]			= ImVec4(0.34f, 0.31f, 0.25f, 0.65f);
-	colors[ImGuiCol_SeparatorHovered]	= ImVec4(0.45f, 0.38f, 0.34f, 0.78f);
-	colors[ImGuiCol_SeparatorActive]	= ImVec4(0.55f, 0.45f, 0.43f, 0.90f);
+	colors[ImGuiCol_Text]				= ImVec4(0.570482f, 0.507079f, 0.354692f, 1.0f);
+	colors[ImGuiCol_TextDisabled]		= ImVec4(0.119280f, 0.119280f, 0.094630f, 1.0f);
+	colors[ImGuiCol_FrameBg]			= ImVec4(0.010816f, 0.011645f, 0.010023f, 1.0f);
+	colors[ImGuiCol_FrameBgHovered]		= ImVec4(0.028622f, 0.025843f, 0.015325f, 1.0f);
+	colors[ImGuiCol_FrameBgActive]		= ImVec4(0.054972f, 0.043234f, 0.017389f, 1.0f);
+	colors[ImGuiCol_CheckMark]			= ImVec4(0.638283f, 0.420033f, 0.083535f, 1.0f);
+	colors[ImGuiCol_SliderGrab]			= ImVec4(0.295700f, 0.214041f, 0.073239f, 1.0f);
+	colors[ImGuiCol_SliderGrabActive]	= ImVec4(0.638283f, 0.393123f, 0.063724f, 1.0f);
+	colors[ImGuiCol_WindowBg]			= ImVec4(0.006571f, 0.006941f, 0.006571f, 1.0f);
+	colors[ImGuiCol_TitleBg]			= ImVec4(0.012510f, 0.012510f, 0.010816f, 1.0f);
+	colors[ImGuiCol_TitleBgActive]		= ImVec4(0.027212f, 0.024515f, 0.018478f, 1.0f);
+	colors[ImGuiCol_TitleBgCollapsed]	= ImVec4(0.004896f, 0.005103f, 0.004896f, 1.0f);
+	colors[ImGuiCol_Button]				= ImVec4(0.036306f, 0.037972f, 0.033105f, 1.0f);
+	colors[ImGuiCol_ButtonHovered]		= ImVec4(0.094630f, 0.083535f, 0.050876f, 1.0f);
+	colors[ImGuiCol_ButtonActive]		= ImVec4(0.187317f, 0.119280f, 0.027212f, 1.0f);
+	colors[ImGuiCol_Border]				= ImVec4(0.073239f, 0.063724f, 0.043234f, 0.55f);
+	colors[ImGuiCol_Separator]			= ImVec4(0.094630f, 0.078288f, 0.050876f, 0.65f);
+	colors[ImGuiCol_SeparatorHovered]	= ImVec4(0.170645f, 0.119280f, 0.094630f, 0.78f);
+	colors[ImGuiCol_SeparatorActive]	= ImVec4(0.263273f, 0.170645f, 0.154872f, 0.90f);
 
 	m_renderConfigureImGuiInitialized = true;
 }

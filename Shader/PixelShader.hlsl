@@ -1,4 +1,6 @@
-float4 PS(float4 inPosH : SV_POSITION) : SV_TARGET
+#include "VertexShader.hlsl"
+
+float4 PS(in OutVertex outVertex) : SV_TARGET
 {
-    return float4(0.5, 0.5, 0.5, 1);
+    return float4(outVertex.color, 1);
 }

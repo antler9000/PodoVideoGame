@@ -53,8 +53,6 @@ void Podo::OptionRestore()
 	int		windowSaveHeightTemp	= 900;
 	bool	vSyncEnabledTemp		= false;
 	bool	hdrEnabledTemp			= false;
-	bool	rayTracingEnabledTemp	= false;
-	bool	meshShaderEnabledTemp	= false;
 	int		guiMasterSizeTemp		= 0;
 
 	result &= OptionReadBool(fin, "FullScreen", fullScreenEnabledTemp);
@@ -64,8 +62,6 @@ void Podo::OptionRestore()
 	result &= OptionReadInt(fin, "WindowSaveHeight", windowSaveHeightTemp);
 	result &= OptionReadBool(fin, "VSync", vSyncEnabledTemp);
 	result &= OptionReadBool(fin, "HDR", hdrEnabledTemp);
-	result &= OptionReadBool(fin, "RayTracing", rayTracingEnabledTemp);
-	result &= OptionReadBool(fin, "MeshShader", meshShaderEnabledTemp);
 	result &= OptionReadInt(fin, "GUIMasterSize", guiMasterSizeTemp);
 
 	if (result == false)

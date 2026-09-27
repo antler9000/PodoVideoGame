@@ -26,7 +26,7 @@ class Podo : public BaseApp<Podo>
 {
 public:
 
-	Podo(HINSTANCE hInstance, int nCmdShow) : BaseApp(L"Podo Nature Engine", hInstance, nCmdShow)
+	Podo(HINSTANCE hInstance, int nCmdShow) : BaseApp(L"Podo Video Game", hInstance, nCmdShow)
 	{
 		OptionRestore();
 
@@ -141,6 +141,8 @@ private:
 	static constexpr	UINT							m_screenBackBufferCount						= 2;
 	static constexpr	DXGI_FORMAT						m_screenBackBufferFormatSDR					= DXGI_FORMAT_R8G8B8A8_UNORM;
 	static constexpr	DXGI_FORMAT						m_screenBackBufferFormatHDR					= DXGI_FORMAT_R10G10B10A2_UNORM;
+	static constexpr	DXGI_FORMAT						m_screenRTVFormatSDR						= DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	static constexpr	DXGI_FORMAT						m_screenRTVFormatHDR						= DXGI_FORMAT_R10G10B10A2_UNORM;
 	static constexpr	DXGI_COLOR_SPACE_TYPE			m_screenBackBufferColorSpaceSDR				= DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709;
 	static constexpr	DXGI_COLOR_SPACE_TYPE			m_screenBackBufferColorSpaceHDR				= DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020;
 	static constexpr	DXGI_FORMAT						m_screenDepthStencilBufferFormat			= DXGI_FORMAT_D24_UNORM_S8_UINT;

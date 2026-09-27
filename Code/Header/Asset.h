@@ -14,6 +14,8 @@
 struct Vertex
 {
 	DirectX::XMFLOAT3 pos;
+	DirectX::XMFLOAT3 normal;
+	DirectX::XMFLOAT3 color;
 };
 
 class Asset

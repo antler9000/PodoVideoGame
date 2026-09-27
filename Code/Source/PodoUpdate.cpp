@@ -28,16 +28,16 @@ using std::wstring;
 
 void Podo::Update()
 {
-	PIXScopedEvent(PIX_COLOR_INDEX(1), L"CPU: 1. Frame Time");
+	PIXScopedEvent(PIX_COLOR_INDEX(1), L"CPU: 01. Frame Time");
 
 	{
-		PIXScopedEvent(PIX_COLOR_INDEX(2), L"CPU: 2. Wait GPU");
+		PIXScopedEvent(PIX_COLOR_INDEX(2), L"CPU: 02. Wait GPU");
 
 		FlushCommandQueue();
 	}
 
 	{
-		PIXScopedEvent(PIX_COLOR_INDEX(3), L"CPU: 3. Non-Render Logic");
+		PIXScopedEvent(PIX_COLOR_INDEX(3), L"CPU: 03. Non-Render Logic");
 
 		UpdateTimers();
 		UpdateCaption();
@@ -45,7 +45,7 @@ void Podo::Update()
 	}
 
 	{
-		PIXScopedEvent(PIX_COLOR_INDEX(4), L"CPU: 4. Render Logic");
+		PIXScopedEvent(PIX_COLOR_INDEX(4), L"CPU: 04. Render Logic");
 
 		UpdateRender();
 	}
@@ -70,7 +70,6 @@ void Podo::UpdateCaption()
 	//NOTE: SetWindowTextW를 너무 자주 호출하면 시스템 부하로 인해 윈도우 전체가 먹통이 되니 반복에 텀을 주자
 	if (captionTimer.GetTimeMilli() > 100.0f)
 	{
-
 		int fps = (m_worldTimerFrame.GetTimeMilli() != 0) ? static_cast<int>(1000 / m_worldTimerFrame.GetTimeMilli()) : 0;
 
 		wstring caption = std::format
@@ -109,7 +108,7 @@ void Podo::UpdateWorld()
 		horizontalBoxObject.SetScale(scale);
 		horizontalBoxObject.SetRotation(lookDirection, upDirection);
 		horizontalBoxObject.SetPosition(position);
-		horizontalBoxObject.UpdateWorldMatrix();
+		horizontalBoxObject.UpdateObjectConstantBuffer();
 	}
 
 	{
@@ -122,7 +121,7 @@ void Podo::UpdateWorld()
 		verticalBoxObject.SetScale(scale);
 		verticalBoxObject.SetRotation(lookDirection, upDirection);
 		verticalBoxObject.SetPosition(position);
-		verticalBoxObject.UpdateWorldMatrix();
+		verticalBoxObject.UpdateObjectConstantBuffer();
 	}
 
 	{
@@ -145,7 +144,7 @@ void Podo::UpdateWorld()
 		m_workloadCamera.SetPosition(cameraPosition);
 		m_workloadCamera.SetTarget(cameraTarget);
 		m_workloadCamera.SetUpDirection(cameraUp);
-		m_workloadCamera.UpdateViewProjMatrix(m_screenBackBufferAspectRatio);
+		m_workloadCamera.UpdateCameraConstantBuffer(m_screenBackBufferAspectRatio);
 	}
 }
 
@@ -157,7 +156,7 @@ void Podo::UpdateRender()
 	}
 
 	{
-		PIXScopedEvent(PIX_COLOR_INDEX(5), L"CPU: 5. Reset Command List");
+		PIXScopedEvent(PIX_COLOR_INDEX(5), L"CPU: 05. Reset Command List");
 
 		ThrowIfFailed(m_commandAllocator->Reset());
 		ThrowIfFailed(m_commandList->Reset(m_commandAllocator.Get(), nullptr));
@@ -167,7 +166,7 @@ void Podo::UpdateRender()
 		PIXScopedEvent(m_commandList.Get(), PIX_COLOR_INDEX(1), L"GPU: 1. Frame Time");
 
 		{
-			PIXScopedEvent(PIX_COLOR_INDEX(6), L"CPU: 6. Bind Resources");
+			PIXScopedEvent(PIX_COLOR_INDEX(6), L"CPU: 06. Bind Resources");
 			PIXScopedEvent(m_commandList.Get(), PIX_COLOR_INDEX(2), L"GPU: 2. Bind Resources");
 
 			ID3D12DescriptorHeap* descriptorHeaps[] = { m_descriptorHeapCBVSRVUAV.Get() };
@@ -202,7 +201,7 @@ void Podo::UpdateRender()
 
 		if(m_engineState == ENGINE_STATE_RUN)
 		{
-			PIXScopedEvent(PIX_COLOR_INDEX(7), L"CPU: 7. Draw Scene");
+			PIXScopedEvent(PIX_COLOR_INDEX(7), L"CPU: 07. Draw Scene");
 			PIXScopedEvent(m_commandList.Get(), PIX_COLOR_INDEX(3), L"GPU: 3. Draw Scene");
 
 			m_commandList->SetPipelineState(m_renderConfigurePipelineStateObject.Get());
@@ -212,7 +211,7 @@ void Podo::UpdateRender()
 			m_commandList->SetGraphicsRootConstantBufferView
 			(
 				CAMERA_CONSTANT,
-				m_workloadCamera.GetViewProjMatrixConstantBufferGPUAddress()
+				m_workloadCamera.GetCameraConstantBufferGPUAddress()
 			);
 
 			for (const auto& [name, object] : m_workloadObjects)
@@ -224,7 +223,7 @@ void Podo::UpdateRender()
 				m_commandList->SetGraphicsRootDescriptorTable
 				(
 					OBJECT_CONSTANT,
-					object.GetWorldMatrixConstantBufferViewGPUHandle()
+					object.GetObjectConstantBufferViewGPUHandle()
 				);
 
 				m_commandList->DrawIndexedInstanced(asset->GetIndexCount(), 1, 0, 0, 0);
@@ -232,14 +231,14 @@ void Podo::UpdateRender()
 		}
 
 		{
-			PIXScopedEvent(PIX_COLOR_INDEX(8), L"CPU: 8. Draw GUI");
+			PIXScopedEvent(PIX_COLOR_INDEX(8), L"CPU: 08. Draw GUI");
 			PIXScopedEvent(m_commandList.Get(), PIX_COLOR_INDEX(4), L"GPU: 4. Draw GUI");
 
 			UpdateGUI();
 		}
 
 		{
-			PIXScopedEvent(PIX_COLOR_INDEX(9), L"CPU: 9. Unbind Resources");
+			PIXScopedEvent(PIX_COLOR_INDEX(9), L"CPU: 09. Unbind Resources");
 			PIXScopedEvent(m_commandList.Get(), PIX_COLOR_INDEX(5), L"GPU: 5. Unbind Resources");
 
 			CD3DX12_RESOURCE_BARRIER barrierRenderTargetToPresent = CD3DX12_RESOURCE_BARRIER::Transition
@@ -285,10 +284,10 @@ void Podo::UpdateGUI()
 	ImGuiViewport* pImGuiViewPort = ImGui::GetMainViewport();
 	ImVec2 imGuiCenterPos = pImGuiViewPort->GetCenter();
 
-	m_imGuiSpacingSize = ImVec2(0.0f, 10.0f) * m_optionGUI.GetMasterScale();
-	m_imGuiSmallButtonSize = ImVec2(120.0f, 40.0f) * m_optionGUI.GetMasterScale();
-	m_imGuiMediumButtonSize = ImVec2(240.0f, 40.0f) * m_optionGUI.GetMasterScale();
-	m_imGuiLargeButtonSize = ImVec2(360.0f, 40.0f) * m_optionGUI.GetMasterScale();
+	m_imGuiSpacingSize		= ImVec2(0.0f, 10.0f) * m_optionGUI.GetMasterScale();
+	m_imGuiSmallButtonSize	= ImVec2(120.0f, 40.0f) * m_optionGUI.GetMasterScale();
+	m_imGuiMediumButtonSize	= ImVec2(240.0f, 40.0f) * m_optionGUI.GetMasterScale();
+	m_imGuiLargeButtonSize	= ImVec2(360.0f, 40.0f) * m_optionGUI.GetMasterScale();
 
 	switch (m_engineState)
 	{
@@ -332,7 +331,7 @@ void Podo::UpdatePrepareStateGUI(ImGuiViewport* pImGuiViewPort, ImVec2 imGuiCent
 		ThrowIfNull(PIXLoadLatestWinPixTimingCapturerLibrary());
 
 		PIXCaptureParameters captureParameters = {};
-		captureParameters.TimingCaptureParameters.FileName				= L"PodoNatureEngineProfile.wpix";
+		captureParameters.TimingCaptureParameters.FileName				= L"PodoVideoEngineProfile.wpix";
 		captureParameters.TimingCaptureParameters.CaptureCpuSamples		= true;
 		captureParameters.TimingCaptureParameters.CpuSamplesPerSecond	= 4000;
 		captureParameters.TimingCaptureParameters.CaptureGpuTiming		= true;
@@ -412,8 +411,8 @@ void Podo::UpdateRunStateGUI(ImGuiViewport* pImGuiViewPort, ImVec2 imGuiCenterPo
 
 	ImGui::Begin("Runtime", nullptr, loadingGuiFlag);
 
-	bool menuButtonClicked = ImGui::Button("End", m_imGuiSmallButtonSize);
-	bool escKeyPressed = ImGui::IsKeyPressed(ImGuiKey_Escape, false);
+	bool menuButtonClicked	= ImGui::Button("End", m_imGuiSmallButtonSize);
+	bool escKeyPressed		= ImGui::IsKeyPressed(ImGuiKey_Escape, false);
 	if (menuButtonClicked == true || escKeyPressed == true)
 	{
 		m_engineState = ENGINE_STATE_PREPARE;

@@ -1,9 +1,9 @@
-# PodoNatureEngine
-HLSL, D3D12, Win32, C++을 이용하여 구현 중인 실시간 3D 벤치마크 워크로드 엔진입니다.
+# PodoVideoGame
+HLSL, D3D12, Win32, C++을 이용하여 구현 중인 비디오 게임입니다.
 
-오픈 월드 자연환경 워크로드의 특성을 분석하고 최적화하는 것을 목표로 합니다.
+마치 비디오 플랫폼처럼 시점과 시간대를 자유롭게 오가며 즐길 수 있도록 하는 것을 목표로 합니다.
 
-현재 기초적인 조명 렌더링 기능을 구현하고 있습니다.
+현재 기초적인 조명 렌더링과 HDR 제시를 구현하고 있습니다. 또한 불필요한 인터페이스 초기화 케이스를 식별하여 최적화하고 있습니다.
 
 <br>
 
@@ -35,7 +35,7 @@ HLSL, D3D12, Win32, C++을 이용하여 구현 중인 실시간 3D 벤치마크 
 
 <br>
 
-
+  
 
 
 <!---------------------------------------------------------------------------------------------------------------------------------------------->
@@ -57,13 +57,13 @@ HLSL, D3D12, Win32, C++을 이용하여 구현 중인 실시간 3D 벤치마크 
 ### 2.2. 빌드 방법
 1. 리포지토리를 다운로드합니다.
 
-2. 다운로드한 리포지토리에 포함된 `PodoNatureEngine.slnx` 솔루션 파일을 더블 클릭합니다.
+2. 다운로드한 리포지토리에 포함된 `PodoVideoGame.slnx` 솔루션 파일을 더블 클릭합니다.
 
 3. Visual Studio 상단의 구성을 `Release`로, 플랫폼을 `x64`로 설정합니다.  
 
 4. Visual Studio 상단에서 `빌드(B)`의 `솔루션 빌드(Ctrl+Shift+B)`를 누릅니다.
 
-5. `OutDir/PodoNatureEngineRelease64.exe` 이름의 파일이 생성되었다면 빌드에 성공한 것입니다.
+5. `OutDir/PodoVideoGameRelease64.exe` 이름의 파일이 생성되었다면 빌드에 성공한 것입니다.
 
 <br>
 
@@ -71,7 +71,7 @@ HLSL, D3D12, Win32, C++을 이용하여 구현 중인 실시간 3D 벤치마크 
 
 
 ### 2.3. 실행 방법
-1. 위 빌드 과정을 통해 생성한 `OutDir/PodoNatureEngineRelease64.exe`를 더블 클릭하여 실행합니다.
+1. 위 빌드 과정을 통해 생성한 `OutDir/PodoVideoGameRelease64.exe`를 더블 클릭하여 실행합니다.
 
 2. 시작 전 옵션을 설정할 수 있는 준비 화면이 나타납니다. `Start` 버튼을 눌러 시작합니다.
 
@@ -97,7 +97,7 @@ HLSL, D3D12, Win32, C++을 이용하여 구현 중인 실시간 3D 벤치마크 
 
 
 ### 3.2. 조명 기능
-현재 조명 연산은 구현되어 있지 않으며, 픽셀 셰이더에서 고정된 색상을 출력하고 있습니다.
+현재 조명 연산은 구현되어 있지 않으며, 픽셀 셰이더에서 프리미티브의 정점에 담긴 색상을 보간하여 출력하고 있습니다.
 
 <br>
 
@@ -110,7 +110,7 @@ HLSL, D3D12, Win32, C++을 이용하여 구현 중인 실시간 3D 벤치마크 
 |키보드 `ESC`       |실행 상태에서 준비 상태로 복귀   |
 |키보드 `ALT+ENTER` |화면 모드 전환                   |
 
-- 일관된 성능 측정을 위해 고정된 카메라 애니메이션만을 제공할 예정입니다.
+- 렌더링 기능 구현 과정에서 동일한 워크로드의 측정과 최적화에 집중하기 위해, 시점 조작 기능은 아직 구현하지 않았습니다.
 
 <br>
 
@@ -153,9 +153,9 @@ HLSL, D3D12, Win32, C++을 이용하여 구현 중인 실시간 3D 벤치마크 
 
 
 ### 4.2. 측정 방법
-1. 빌드 구성을 `Profile`로 설정한 뒤 빌드를 수행하여 `OutDir/PodoNatureEngineProfile64.exe` 실행 파일을 생성합니다.
+1. 빌드 구성을 `Profile`로 설정한 뒤 빌드를 수행하여 `OutDir/PodoVideoGameProfile64.exe` 실행 파일을 생성합니다.
    
-2. 생성된 `OutDir/PodoNatureEngineProfile64.exe` 파일을 우클릭한 뒤 관리자 권한으로 실행합니다.  
+2. 생성된 `OutDir/PodoVideoGameProfile64.exe` 파일을 우클릭한 뒤 관리자 권한으로 실행합니다.  
   (만일 관리자 권한으로 실행하지 않을시 PIX 측정을 시작할 수 없어, 이후 `Start` 버튼을 누르는 과정에서 오류가 발생합니다.)
 
 3. 준비 화면에서 측정 옵션을 설정합니다. 화면 모드는 전체 화면으로 설정하고, 먼저 VSync는 비활성화합니다.
@@ -164,7 +164,7 @@ HLSL, D3D12, Win32, C++을 이용하여 구현 중인 실시간 3D 벤치마크 
 
 5. 측정하고 싶은 구간이 끝나면 `End` 버튼을 눌러 캡처를 종료합니다.
 
-6. 생성된 측정 결과 파일인 `OutDir/PodoNatureEngineProfile.wpix`을 더블 클릭하여 PIX에서 엽니다.
+6. 생성된 측정 결과 파일인 `OutDir/PodoVideoGameProfile.wpix`을 더블 클릭하여 PIX에서 엽니다.
 
 7. `Metrics` 탭을 통해 각 이벤트의 소요 시간을 분석합니다.  
   (만일 분석 이벤트가 표시되지 않을 경우, 우측의 `PIX CPU Events`와 `PIX GPU Events`의 항목을 활성화합니다.)
@@ -180,54 +180,52 @@ HLSL, D3D12, Win32, C++을 이용하여 구현 중인 실시간 3D 벤치마크 
 [VSync Off]
 |구분 |측정 구간                                                                  |평균 소요 시간 |
 |-----|---------------------------------------------------------------------------|--------------:|
-|CPU  |1. 프레임 시간                                                             |352,561 ns     |
-|     |├─ 2. GPU 명령 완료 대기                                                   |64,259 ns      |
-|     |├─ 3. 논-렌더 로직                                                         |4,341 ns       |
-|     |└─ 4. 렌더 로직                                                            |283,708 ns     |
-|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 5. 커맨드 리스트 초기화 |8,724 ns       |
-|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 6. 자원 바인딩          |8,784 ns       |
-|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 7. 씬 그리기            |3,363 ns       |
-|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 8. GUI 그리기           |10,423 ns      |
-|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 9. 자원 언바인딩        |1,477 ns       |
-|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 10. 커맨드 리스트 제출  |64,689 ns      |
-|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ 11. 제시                |185,554 ns     |
-|GPU  |1. 프레임 시간                                                             |23,063 ns      |
-|     |├─ 2. 자원 바인딩                                                          |21,872 ns      |
-|     |├─ 3. 씬 그리기                                                            |1,039 ns       |
-|     |├─ 4. GUI 그리기                                                           |96 ns          |
-|     |└─ 5. 자원 언바인딩                                                        |9 ns           |
+|CPU  |1. 프레임 시간                                                             |362,328 ns     |
+|     |├─ 2. GPU 명령 완료 대기                                                   |90,857 ns      |
+|     |├─ 3. 논-렌더 로직                                                         |4,916 ns       |
+|     |└─ 4. 렌더 로직                                                            |266,322 ns     |
+|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 5. 커맨드 리스트 초기화 |9,971 ns       |
+|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 6. 자원 바인딩          |8,833 ns       |
+|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 7. 씬 그리기            |3,341 ns       |
+|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 8. GUI 그리기           |10,486 ns      |
+|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 9. 자원 언바인딩        |1,566 ns       |
+|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 10. 커맨드 리스트 제출  |60,591 ns      |
+|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ 11. 제시                |170,878 ns     |
+|GPU  |1. 프레임 시간                                                             |23,864 ns      |
+|     |├─ 2. 자원 바인딩                                                          |22,579 ns      |
+|     |├─ 3. 씬 그리기                                                            |1,139 ns       |
+|     |├─ 4. GUI 그리기                                                           |98 ns          |
+|     |└─ 5. 자원 언바인딩                                                        |10 ns          |
 
-- 총 캡처 시간: 11,140.10 ms
+- 총 캡처 시간: 8,845.25 ms
 
-- GPU 명령이 모두 소진될 때까지 CPU를 대기시키는 현 로직으로 인해, '2. GPU 명령 완료 대기' 과정에서 CPU 프레임 시간의 약 20%가 대기 상태로 낭비되고 있습니다.
+- GPU 명령이 모두 소진될 때까지 CPU를 대기시키는 현 로직으로 인해, '2. GPU 명령 완료 대기' 과정에서 CPU 프레임 시간의 약 25%가 대기 상태로 낭비되고 있습니다.
 
 - '11. 제시' 과정은 현재 CPU 프레임 시간의 약 절반을 차지하고 있지만, 렌더링 워크로드가 무거워지면 고정적인 제시 과정의 비중은 감소할 것으로 예상합니다.
-
-- 측정 결과 파일에 담긴 그래프 분포를 살펴본 결과, 특이하게 GPU의 '2. 자원 바인딩' 과정이 측정 시작 후 2.5초 시점에 소요 시간이 절반 이하로(약 60,000 ns -> 20,000 ns) 줄어들며 히스토그램 분포가 양분됨을 발견하였습니다. 이는 아래 VSync를 킨 경우에도 비슷한 양상 나타났지만, 원인은 파악하지 못하였습니다. 
 
 <br>
 
 [VSync On]  
 |구분 |측정 구간                                                                  |평균 소요 시간 |
 |-----|---------------------------------------------------------------------------|--------------:|
-|CPU  |1. 프레임 시간                                                             |4,156,566 ns   |
-|     |├─ 2. GPU 명령 완료 대기                                                   |3,664,646 ns   |
-|     |├─ 3. 논-렌더 로직                                                         |8,592 ns       |
-|     |└─ 4. 렌더 로직                                                            |482,635 ns     |
-|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 5. 커맨드 리스트 초기화 |21,004 ns      |
-|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 6. 자원 바인딩          |20,221 ns      |
-|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 7. 씬 그리기            |7,155 ns       |
-|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 8. GUI 그리기           |24,406 ns      |
-|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 9. 자원 언바인딩        |3,295 ns       |
-|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 10. 커맨드 리스트 제출  |114,985 ns     |
-|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ 11. 제시                |290,559 ns     |
-|GPU  |1. 프레임 시간                                                             |63,925 ns      |
-|     |├─ 2. 자원 바인딩                                                          |60,306 ns      |
-|     |├─ 3. 씬 그리기                                                            |3,126 ns       |
-|     |├─ 4. GUI 그리기                                                           |427 ns         |
-|     |└─ 5. 자원 언바인딩                                                        |8 ns           |
+|CPU  |1. 프레임 시간                                                             |4,148,915 ns   |
+|     |├─ 2. GPU 명령 완료 대기                                                   |3,565,798 ns   |
+|     |├─ 3. 논-렌더 로직                                                         |21,302 ns      |
+|     |└─ 4. 렌더 로직                                                            |560,952 ns     |
+|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 5. 커맨드 리스트 초기화 |23,855 ns      |
+|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 6. 자원 바인딩          |23,213 ns      |
+|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 7. 씬 그리기            |7,698 ns       |
+|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 8. GUI 그리기           |24,960 ns      |
+|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 9. 자원 언바인딩        |3,436 ns       |
+|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 10. 커맨드 리스트 제출  |134,496 ns     |
+|     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ 11. 제시                |342,258 ns     |
+|GPU  |1. 프레임 시간                                                             |141,546 ns     |
+|     |├─ 2. 자원 바인딩                                                          |132,994 ns     |
+|     |├─ 3. 씬 그리기                                                            |7,903 ns       |
+|     |├─ 4. GUI 그리기                                                           |568 ns         |
+|     |└─ 5. 자원 언바인딩                                                        |17 ns          |
 
-- 총 캡처 시간: 11,452.36 ms
+- 총 캡처 시간: 9,829.32 ms
 
 - VSync를 켰으므로 명령 큐에 제출된 Present 명령은 VSyncBlank 타이밍에 처리되고, 이 시점까지 `FlushCommandQueue()`가 CPU의 다음 프레임 렌더 시작을 블록하므로, CPU의 '2. GPU 명령 완료 대기' 시간이 늘어납니다.
 
@@ -272,15 +270,15 @@ HLSL, D3D12, Win32, C++을 이용하여 구현 중인 실시간 3D 벤치마크 
   - NuGet 패키지 관리 (Microsoft.Direct3D.D3D12)
   
 - 복원 위치
-  - `PodoNatureEngine\packages\Microsoft.Direct3D.D3D12.<버전명>`
+  - `PodoVideoGame\packages\Microsoft.Direct3D.D3D12.<버전명>`
 
 - 라이선스 종류
   - MICROSOFT SOFTWARE LICENSE
   - MIT License
 
 - 라이선스 위치
-  - `PodoNatureEngine\packages\Microsoft.Direct3D.D3D12.<버전명>\LICENSE.txt`
-  - `PodoNatureEngine\packages\Microsoft.Direct3D.D3D12.<버전명>\LICENSE-CODE.txt`
+  - `PodoVideoGame\packages\Microsoft.Direct3D.D3D12.<버전명>\LICENSE.txt`
+  - `PodoVideoGame\packages\Microsoft.Direct3D.D3D12.<버전명>\LICENSE-CODE.txt`
 
 <br>
 
@@ -295,13 +293,13 @@ HLSL, D3D12, Win32, C++을 이용하여 구현 중인 실시간 3D 벤치마크 
   - NuGet 패키지 관리 (directxtk12_desktop_win10)
 
 - 복원 위치
-  - `PodoNatureEngine\packages\directxtk12_desktop_win10.<버전명>`
+  - `PodoVideoGame\packages\directxtk12_desktop_win10.<버전명>`
 
 - 라이선스 종류
   - MIT License
 
 - 라이선스 위치
-  - `PodoNatureEngine\packages\directxtk12_desktop_win10.<버전명>\docs\README.md` 내부 간접 링크
+  - `PodoVideoGame\packages\directxtk12_desktop_win10.<버전명>\docs\README.md` 내부 간접 링크
   - `https://github.com/microsoft/DirectXTK12/blob/main/LICENSE`
 
 <br>
@@ -317,13 +315,13 @@ HLSL, D3D12, Win32, C++을 이용하여 구현 중인 실시간 3D 벤치마크 
   - NuGet 패키지 관리 (WinPixEventRuntime)
   
 - 복원 위치
-  - `PodoNatureEngine\packages\WinPixEventRuntime.<버전명>`
+  - `PodoVideoGame\packages\WinPixEventRuntime.<버전명>`
 
 - 라이선스 종류
   - MIT License
 
 - 라이선스 위치
-  - `PodoNatureEngine\packages\WinPixEventRuntime.<버전명>\license.txt`
+  - `PodoVideoGame\packages\WinPixEventRuntime.<버전명>\license.txt`
 
 <br>
 
@@ -335,8 +333,8 @@ HLSL, D3D12, Win32, C++을 이용하여 구현 중인 실시간 3D 벤치마크 
   - 옵션 GUI 제공
 
 - 사용 방식
-  - 리포지토리 내부에 직접 포함함(`PodoNatureEngine\External\imgui`)
-  - 예제 코드의 일부를 수정하여 사용함(`PodoNatureEngine\Code\Header\Alloc.h`)
+  - 리포지토리 내부에 직접 포함함(`PodoVideoGame\External\imgui`)
+  - 예제 코드의 일부를 수정하여 사용함(`PodoVideoGame\Code\Header\Alloc.h`)
 
 - 원본 리포지토리
   - ocornut/imgui  
@@ -346,7 +344,7 @@ HLSL, D3D12, Win32, C++을 이용하여 구현 중인 실시간 3D 벤치마크 
   - MIT License
 
 - 라이선스 위치
-  - `PodoNatureEngine\External\imgui\LICENSE.txt`
+  - `PodoVideoGame\External\imgui\LICENSE.txt`
 
 <br>
 

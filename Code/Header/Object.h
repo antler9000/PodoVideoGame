@@ -8,6 +8,12 @@
 #include <windows.h>
 #include <string.h>
 
+struct ObjectConstantBuffer
+{
+	DirectX::XMFLOAT4X4 worldMatrix;
+	DirectX::XMFLOAT4X4 worldInvTransMatrix;
+};
+
 class Object
 {
 public:
@@ -24,7 +30,7 @@ public:
 	{
 		m_asset = asset;
 
-		constexpr UINT			constantBufferSize = (sizeof(DirectX::XMFLOAT4X4) + 255) & ~255;
+		constexpr UINT			constantBufferSize = (sizeof(ObjectConstantBuffer) + 255) & ~255;
 		D3D12_HEAP_PROPERTIES	heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 		D3D12_RESOURCE_DESC		resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(constantBufferSize);
 
@@ -37,11 +43,11 @@ public:
 				&resourceDesc,
 				D3D12_RESOURCE_STATE_GENERIC_READ,
 				nullptr,
-				IID_PPV_ARGS(m_worldMatrixConstantBuffer.ReleaseAndGetAddressOf())
+				IID_PPV_ARGS(m_objectConstantBuffer.ReleaseAndGetAddressOf())
 			)
 		);
 
-		UpdateWorldMatrix();
+		UpdateObjectConstantBuffer();
 	}
 
 	void SetPosition(DirectX::XMVECTOR position)
@@ -49,6 +55,7 @@ public:
 		DirectX::XMStoreFloat3(&m_position, position);
 	}
 
+	//Note: lookDirection과 upDirection가 영벡터에 가깝지 않고, 서로 평행에 가깝지 않음을 호출부에서 책임져야 함
 	void XM_CALLCONV SetRotation(DirectX::FXMVECTOR lookDirection, DirectX::FXMVECTOR upDirection)
 	{
 		DirectX::XMVECTOR zAxis = DirectX::XMVector3Normalize(lookDirection);
@@ -73,7 +80,7 @@ public:
 		DirectX::XMStoreFloat3(&m_scale, scale);
 	}
 
-	void UpdateWorldMatrix()
+	void UpdateObjectConstantBuffer()
 	{
 		DirectX::XMVECTOR direction	= DirectX::XMLoadFloat4(&m_rotation);
 		DirectX::XMVECTOR scale		= DirectX::XMLoadFloat3(&m_scale);
@@ -84,17 +91,18 @@ public:
 			DirectX::XMMatrixRotationQuaternion(direction) *
 			DirectX::XMMatrixTranslationFromVector(position);
 
-		DirectX::XMMATRIX transposedWorldMatrix = DirectX::XMMatrixTranspose(worldMatrix);
+		DirectX::XMMATRIX worldInvMatrix = XMMatrixInverse(nullptr, worldMatrix);
 
-		DirectX::XMFLOAT4X4 constantData;
-		DirectX::XMStoreFloat4x4(&constantData, transposedWorldMatrix);
+		ObjectConstantBuffer objectConstantBufferData;
+		XMStoreFloat4x4(&objectConstantBufferData.worldMatrix, XMMatrixTranspose(worldMatrix));
+		XMStoreFloat4x4(&objectConstantBufferData.worldInvTransMatrix, worldInvMatrix);
 
 		void* mappedData = nullptr;
 		D3D12_RANGE readRange = { 0, 0 };
 
-		ThrowIfFailed(m_worldMatrixConstantBuffer->Map(0, &readRange, &mappedData));
-		std::memcpy(mappedData, &constantData, sizeof(constantData));
-		m_worldMatrixConstantBuffer->Unmap(0, nullptr);
+		ThrowIfFailed(m_objectConstantBuffer->Map(0, &readRange, &mappedData));
+		std::memcpy(mappedData, &objectConstantBufferData, sizeof(objectConstantBufferData));
+		m_objectConstantBuffer->Unmap(0, nullptr);
 	}
 
 	const Asset* GetAsset() const
@@ -102,24 +110,24 @@ public:
 		return m_asset;
 	}
 
-	D3D12_GPU_VIRTUAL_ADDRESS GetWorldMatrixConstantBufferGPUAddress() const
+	D3D12_GPU_VIRTUAL_ADDRESS GetObjectConstantBufferGPUAddress() const
 	{
-		return m_worldMatrixConstantBuffer->GetGPUVirtualAddress();
+		return m_objectConstantBuffer->GetGPUVirtualAddress();
 	}
 	
-	UINT GetWorldMatrixConstantBufferWidth() const
+	UINT GetObjectConstantBufferWidth() const
 	{
-		return static_cast<UINT>(m_worldMatrixConstantBuffer->GetDesc().Width);
+		return static_cast<UINT>(m_objectConstantBuffer->GetDesc().Width);
 	}
 
-	void SetWorldMatrixConstantBufferViewGPUHandle(D3D12_GPU_DESCRIPTOR_HANDLE handle)
+	void SetObjectConstantBufferViewGPUHandle(D3D12_GPU_DESCRIPTOR_HANDLE handle)
 	{
-		m_worldMatrixConstantBufferViewGPUHandle = handle;
+		m_objectConstantBufferViewGPUHandle = handle;
 	}
 
-	D3D12_GPU_DESCRIPTOR_HANDLE GetWorldMatrixConstantBufferViewGPUHandle() const
+	D3D12_GPU_DESCRIPTOR_HANDLE GetObjectConstantBufferViewGPUHandle() const
 	{
-		return m_worldMatrixConstantBufferViewGPUHandle;
+		return m_objectConstantBufferViewGPUHandle;
 	}
 
 private:
@@ -130,7 +138,7 @@ private:
 	DirectX::XMFLOAT4 m_rotation	= { 0.0f, 0.0f, 0.0f, 1.0f };
 	DirectX::XMFLOAT3 m_position	= { 0.0f, 0.0f, 0.0f };
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> m_worldMatrixConstantBuffer;
+	Microsoft::WRL::ComPtr<ID3D12Resource> m_objectConstantBuffer;
 
-	D3D12_GPU_DESCRIPTOR_HANDLE m_worldMatrixConstantBufferViewGPUHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE m_objectConstantBufferViewGPUHandle = {};
 };
