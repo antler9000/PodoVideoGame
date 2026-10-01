@@ -1,7 +1,13 @@
 #define NOMINMAX
+
+//Podo
 #include "Podo.h"
 #include "Debug.h"
+
+//Win32
 #include <windows.h>
+
+//C++
 #include <stdexcept>
 
 void Podo::FlushCommandQueue()

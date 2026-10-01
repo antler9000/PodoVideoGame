@@ -1,11 +1,19 @@
 ﻿#pragma once
+
+//Podo
 #include "Debug.h"
-#include <d3d12.h>
-#include <d3dx12_core.h>
-#include <DirectXMath.h>
-#include <wrl/client.h>
+
+//Win32
 #include <windows.h>
-#include <string.h>
+#include <wrl/client.h>
+
+//D3D12
+#include <d3dx12_core.h>
+#include <d3d12.h>
+#include <DirectXMath.h>
+
+//C++
+#include <cstring>
 
 struct CameraConstantBuffer
 {
@@ -61,7 +69,7 @@ public:
 		DirectX::XMStoreFloat3(&m_upDirection, upDirection);
 	}
 
-	//Note: (m_target - m_position)와 m_upDirection가 영벡터에 가깝지 않고, 서로 평행에 가깝지 않음을 호출부에서 책임져야 함
+	//NOTE: (m_target - m_position)와 m_upDirection가 영벡터에 가깝지 않고, 서로 평행에 가깝지 않음을 호출부에서 책임져야 함
 	void UpdateCameraConstantBuffer(float aspectRatio)
 	{
 		DirectX::XMVECTOR position		= DirectX::XMLoadFloat3(&m_position);

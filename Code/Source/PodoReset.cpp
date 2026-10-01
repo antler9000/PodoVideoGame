@@ -1,21 +1,34 @@
 ﻿#define NOMINMAX
+
+//Podo
 #include "Podo.h"
-#include "root.h"
-#include "Asset.h"
 #include "Option.h"
 #include "Object.h"
+#include "Asset.h"
+#include "Root.h"
 #include "Alloc.h"
 #include "Debug.h"
+
+//ImGui
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx12.h"
+
+//Win32
+#include <windows.h>
+#include <wrl/client.h>
+
+//D3D12
+#include <ResourceUploadBatch.h>
 #include <d3dx12_root_signature.h>
 #include <d3dx12_default.h>
 #include <d3dx12_core.h>
 #include <d3d12.h>
 #include <d3dcommon.h>
-#include <ResourceUploadBatch.h>
 #include <d3dcompiler.h>
+#include <DirectXMath.h>
+
+//DXGI
 #include <dxgi1_6.h>
 #include <dxgi1_5.h>
 #include <dxgi1_4.h>
@@ -24,9 +37,8 @@
 #include <dxgi.h>
 #include <dxgicommon.h>
 #include <dxgiformat.h>
-#include <DirectXMath.h>
-#include <wrl/client.h>
-#include <windows.h>
+
+//C++
 #include <algorithm>
 #include <string>
 #include <vector>
@@ -58,7 +70,9 @@ void Podo::Reset()
 		ResetFactory();
 		ResetAdapterAndOutput();
 
+		//TODO: 어댑터가 안 바뀌었으면 요청 생략하도록 곤치기
 		m_needResetDevice		= true;
+		//TODO: 아웃풋이 안 바뀌었으면 요청 생략하도록 곤치기
 		m_needResetSwapChain	= true;
 
 		m_needResetFactory		= false;
@@ -96,6 +110,7 @@ void Podo::Reset()
 		ResetRTV();
 		ResetDSV();
 
+		//TODO: RTV 포맷이 안 바뀌었으면 요청 생략하도록 곤치기
 		m_needResetRenderConfigure	= true;
 
 		m_needResetSwapChain		= false;
@@ -771,7 +786,7 @@ void Podo::ResetAssets()
 	}
 	auto uploadFinished = resourceUpload.End(m_commandQueue.Get());
 
-	//Note: 커맨드 큐에 제출된 자원 복사 작업은 이후 제출될 렌더 명령들과 순서가 지켜지기에 굳이 대기가 필요하지 않지만,
+	//NOTE: 커맨드 큐에 제출된 자원 복사 작업은 이후 제출될 렌더 명령들과 순서가 지켜지기에 굳이 대기가 필요하지 않지만,
 	//		End(..)가 반환하는 std::future에 의해 어쩔 수 없이 대기가 발생함을 코드로 표기해놓기로 함
 	uploadFinished.wait();
 }

@@ -1,24 +1,36 @@
-﻿#define IMGUI_DEFINE_MATH_OPERATORS
-#define NOMINMAX
+﻿#define NOMINMAX
+#define IMGUI_DEFINE_MATH_OPERATORS
+
+//Podo
 #include "Podo.h"
 #include "State.h"
 #include "Timer.h"
-#include "Root.h"
 #include "Object.h"
 #include "Asset.h"
+#include "Root.h"
 #include "Debug.h"
+
+//ImGui
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx12.h"
+
+//Win32
+#include <windows.h>
+
+//D3D12
+#include <pix3.h>
 #include <d3dx12_root_signature.h>
 #include <d3dx12_barriers.h>
 #include <d3d12.h>
 #include <d3dcommon.h>
 #include <DirectXMath.h>
 #include <DirectXColors.h>
-#include <windows.h>
+
+//DXGI
 #include <dxgi.h>
-#include <pix3.h>
+
+//C++
 #include <format>
 #include <string>
 #include <cstdlib>
@@ -396,6 +408,7 @@ void Podo::UpdatePrepareStateGUI(ImGuiViewport* pImGuiViewPort, ImVec2 imGuiCent
 	}
 	if (previousGUIState != nowGUIState)
 	{
+		//TODO: PSO 초기화는 하지 않도록 초기화 단계를 분할하기
 		m_needResetRenderConfigure = true;
 	}
 

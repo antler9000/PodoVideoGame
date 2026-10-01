@@ -1,8 +1,14 @@
 ﻿#pragma once
 #define NOMINMAX
+
+//ImGui
 #include "imgui.h"
-#include <d3d12.h>
+
+//Win32
 #include <windows.h>
+
+//D3D12
+#include <d3d12.h>
 
 //NOTE: Dear ImGui의 Win32 + D3D12 예제에 사용된 할당자를 수정하여 사용함
 struct ImGuiDescriptorHeapAllocator

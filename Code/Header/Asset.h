@@ -1,15 +1,25 @@
 ﻿#pragma once
+
+//Podo
 #include "Debug.h"
-#include <d3d12.h>
-#include <dxgiformat.h>
+
+//Win32
+#include <windows.h>
 #include <wrl/client.h>
-#include <DirectXMath.h>
+
+//D3D12
 #include <ResourceUploadBatch.h>
 #include <BufferHelpers.h>
-#include <windows.h>
+#include <d3d12.h>
+#include <DirectXMath.h>
+
+//DXGI
+#include <dxgiformat.h>
+
+//C++
 #include <vector>
-#include <cstdint>
 #include <utility>
+#include <cstdint>
 
 struct Vertex
 {

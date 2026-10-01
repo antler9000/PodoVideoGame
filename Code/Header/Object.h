@@ -1,12 +1,20 @@
 ﻿#pragma once
+
+//Podo
 #include "Asset.h"
 #include "Debug.h"
-#include <d3d12.h>
-#include <d3dx12_core.h>
-#include <DirectXMath.h>
-#include <wrl/client.h>
+
+//Win32
 #include <windows.h>
-#include <string.h>
+#include <wrl/client.h>
+
+//D3D12
+#include <d3dx12_core.h>
+#include <d3d12.h>
+#include <DirectXMath.h>
+
+//C++
+#include <cstring>
 
 struct ObjectConstantBuffer
 {
@@ -55,7 +63,7 @@ public:
 		DirectX::XMStoreFloat3(&m_position, position);
 	}
 
-	//Note: lookDirection과 upDirection가 영벡터에 가깝지 않고, 서로 평행에 가깝지 않음을 호출부에서 책임져야 함
+	//NOTE: lookDirection과 upDirection가 영벡터에 가깝지 않고, 서로 평행에 가깝지 않음을 호출부에서 책임져야 함
 	void XM_CALLCONV SetRotation(DirectX::FXMVECTOR lookDirection, DirectX::FXMVECTOR upDirection)
 	{
 		DirectX::XMVECTOR zAxis = DirectX::XMVector3Normalize(lookDirection);

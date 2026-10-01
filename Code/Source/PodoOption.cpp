@@ -1,10 +1,16 @@
 #define NOMINMAX
+
+//Podo
 #include "Podo.h"
+
+//Win32
 #include <windows.h>
+
+//C++
 #include <algorithm>
 #include <string>
-#include <cstdio>
 #include <fstream>
+#include <cstdio>
 
 void Podo::OptionSave()
 {

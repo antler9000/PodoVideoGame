@@ -1,8 +1,12 @@
 ﻿#pragma once
 #define NOMINMAX
+
+//Win32
 #include <windows.h>
-#include <string>
+
+//C++
 #include <format>
+#include <string>
 
 struct OptionFullScreen
 {
